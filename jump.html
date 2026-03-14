@@ -1,28 +1,263 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>常用网站导航</title>
+    <title>快捷跳转工具 · 卡密版</title>
+    <!-- 适配 GitHub Pages 响应式基础 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .button { 
-            display: inline-block; 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+        
+        /* 登录选择页 */
+        .choice-page { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; }
+        .choice-page h2 { margin-bottom: 30px; color: #1e2b3c; font-weight: 600; letter-spacing: 1px; }
+        .choice-btn { 
             padding: 15px 30px; 
             margin: 10px; 
-            background-color: #0078d4; 
+            font-size: 18px; 
+            font-weight: 500;
             color: white; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-size: 18px;
+            border: none; 
+            border-radius: 60px; 
+            cursor: pointer; 
+            text-decoration: none;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 180px;
         }
-        .button:hover { background-color: #005a9e; }
+        .choice-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .admin-login { background: #0078d4; }
+        .guest-enter { background: #2c5e2e; }
+
+        /* 登录框 (同时也是卡密输入框) */
+        .login-box { background: white; padding: 35px 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 400px; max-width: 100%; display: none; }
+        .login-box h2 { text-align: center; margin-bottom: 20px; color: #0b2a41; font-weight: 600; }
+        .login-box .sub-hint { text-align: center; font-size: 14px; color: #4a6f8a; margin-bottom: 25px; border-bottom: 1px dashed #ccc; padding-bottom: 12px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 6px; color: #1e3b5c; font-weight: 500; font-size: 15px; }
+        .input-group input { width: 100%; padding: 14px 18px; border: 2px solid #e0e7ef; border-radius: 40px; font-size: 16px; transition: 0.15s; background: #f9fcff; }
+        .input-group input:focus { border-color: #0078d4; outline: none; background: white; }
+        .login-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: #0078d4; 
+            color: white; 
+            border: none; 
+            border-radius: 60px; 
+            font-size: 17px; 
+            font-weight: 600;
+            cursor: pointer; 
+            margin-top: 12px; 
+            transition: 0.2s;
+            box-shadow: 0 5px 10px rgba(0,120,212,0.3);
+        }
+        .login-btn:hover { background: #005a9e; transform: scale(1.02); }
+        .error-msg { color: #d32f2f; text-align: center; margin-top: 15px; font-weight: 500; display: none; background: #ffebee; padding: 10px; border-radius: 40px; }
+        .back-link { margin-top: 20px; text-align: center; }
+        .back-link button { background: transparent; border: 2px solid #7f8c8d; color: #2c3e50; padding: 10px 25px; border-radius: 40px; font-size: 15px; cursor: pointer; font-weight: 500; }
+        .back-link button:hover { background: #ecf0f1; }
+
+        /* 主页 */
+        .home-container { text-align: center; padding: 40px 30px; background: white; border-radius: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 900px; width: 100%; display: none; }
+        .home-container h2 { margin-bottom: 30px; color: #0b2a41; font-size: 32px; font-weight: 700; border-left: 8px solid #0078d4; display: inline-block; padding-left: 20px; }
+        .btn-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 30px 0 20px; }
+        .btn { 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px; 
+            font-size: 18px; 
+            font-weight: 600;
+            color: white; 
+            border: none; 
+            border-radius: 60px; 
+            cursor: pointer; 
+            text-decoration: none;
+            transition: 0.2s;
+            box-shadow: 0 8px 14px rgba(0,0,0,0.2);
+            min-width: 140px;
+            letter-spacing: 1px;
+        }
+        .btn:hover { transform: translateY(-4px); filter: brightness(1.05); box-shadow: 0 12px 20px rgba(0,0,0,0.25); }
+        .bing { background: #0078d4; }
+        .bilibili { background: #fb7299; }
+        .douyin { background: #fe2c55; }
+        .youtube { background: #ff0000; }
+        .minecraft { background: #4CAF50; }
+        .mcjs { background: #2196F3; }
+        .add-web { background: #ff9800; } 
+        .logout-btn { background: #c0392b; margin-top: 8px; }
+
+        /* 退出按钮独立一行 */
+        .logout-row { margin-top: 30px; }
+
+        /* 卡密提示 */
+        .card-sn { background: #f0f9ff; padding: 8px 20px; border-radius: 60px; color: #0077be; font-weight: 600; font-size: 14px; border: 1px solid #b8d9f5; display: inline-block; margin-bottom: 20px; }
+        footer { margin-top: 30px; color: #7f8c8d; font-size: 13px; }
     </style>
 </head>
 <body>
-    <h1>常用网站导航</h1>
-    <a href="https://cn.bing.com" class="button">访问必应</a>
-    <a href="https://www.bilibili.com" class="button">访问哔哩哔哩</a>
-    <a href="https://www.douyin.com" class="button">访问抖音</a>
+    <!-- 登录选择页（默认可见） -->
+    <div id="choice-page" class="choice-page">
+        <h2>🔖 快捷跳转工具</h2>
+        <div class="card-sn">管理员卡密 · FKUS6FA3A4G7A2V7</div>
+        <button class="choice-btn admin-login" onclick="showLogin()">🔑 管理员登录</button>
+        <button class="choice-btn guest-enter" onclick="enterGuest()">👤 游客进入</button>
+        <footer>GitHub Pages 适配 · 点击即跳转</footer>
+    </div>
+
+    <!-- 管理员登录页（卡密登录） -->
+    <div id="login-page" class="login-box">
+        <h2>🔐 管理员验证</h2>
+        <div class="sub-hint">请输入卡密 (唯一激活码)</div>
+        <div class="input-group">
+            <label for="cardKey">卡密</label>
+            <input type="text" id="cardKey" placeholder="例如: FKUS6FA3A4G7A2V7" value="FKUS6FA3A4G7A2V7">
+        </div>
+        <!-- 保留原账号密码隐藏域，但不再使用；直接用卡密验证，但为了逻辑清晰去掉用户名密码输入框，简化界面。 
+             完全按照要求：卡密 = FKUS6FA3A4G7A2V7   -->
+        <button class="login-btn" onclick="loginWithCard()">验证并登录</button>
+        <div id="error-msg" class="error-msg">卡密无效，请重新输入</div>
+        <div class="back-link">
+            <button onclick="backToChoice()">← 返回选择</button>
+        </div>
+        <!-- 隐藏旧的账号密码字段，但保留DOM以防脚本报错 (已经移除) 直接替换为卡密输入框 -->
+    </div>
+
+    <!-- 主页（游客/管理员共用） -->
+    <div id="home-page" class="home-container">
+        <h2>⚡ 快捷跳转</h2>
+        <div class="btn-grid" id="btn-grid-container">
+            <a href="https://cn.bing.com" target="_blank" class="btn bing">必应</a>
+            <a href="https://www.bilibili.com" target="_blank" class="btn bilibili">B站</a>
+            <a href="https://www.douyin.com" target="_blank" class="btn douyin">抖音</a>
+            <a href="https://www.youtube.com" target="_blank" class="btn youtube">YouTube</a>
+            <a href="https://www.minecraft.net" target="_blank" class="btn minecraft">Minecraft</a>
+            <a href="https://mcjs.cc" target="_blank" class="btn mcjs">MC JS</a>
+            <!-- 管理员专属：添加网页按钮 (默认隐藏) -->
+            <button class="btn add-web" id="add-web-btn" style="display:none;" onclick="addWeb()">➕ 添加网页</button>
+        </div>
+        <div class="logout-row">
+            <button class="btn logout-btn" onclick="logout()">🚪 退出</button>
+        </div>
+        <footer style="margin-top:10px;">✨ 点击图标直接跳转</footer>
+    </div>
+
+    <script>
+        (function() {
+            // ----- 核心卡密定义 (硬编码) -----
+            const VALID_CARD = "FKUS6FA3A4G7A2V7";
+
+            // 获取元素
+            const choicePage = document.getElementById('choice-page');
+            const loginPage = document.getElementById('login-page');
+            const homePage = document.getElementById('home-page');
+            const addWebBtn = document.getElementById('add-web-btn');
+            const errorMsg = document.getElementById('error-msg');
+            const cardInput = document.getElementById('cardKey');
+
+            // 确保初始状态：只有choice显示，login隐藏，home隐藏
+            choicePage.style.display = 'block';
+            loginPage.style.display = 'none';
+            homePage.style.display = 'none';
+            if (addWebBtn) addWebBtn.style.display = 'none';
+
+            // 暴露全局函数 (已经存在, 但重新定义确保卡密逻辑)
+            window.showLogin = function() {
+                choicePage.style.display = 'none';
+                loginPage.style.display = 'block';
+                homePage.style.display = 'none';
+                // 清空错误信息
+                if (errorMsg) errorMsg.style.display = 'none';
+                if (cardInput) cardInput.value = ''; // 可选清空，但保留默认值方便演示
+            };
+
+            window.enterGuest = function() {
+                choicePage.style.display = 'none';
+                loginPage.style.display = 'none';
+                homePage.style.display = 'block';
+                // 游客模式：确保添加按钮不可见
+                if (addWebBtn) addWebBtn.style.display = 'none';
+            };
+
+            window.backToChoice = function() {
+                choicePage.style.display = 'block';
+                loginPage.style.display = 'none';
+                homePage.style.display = 'none';
+                if (errorMsg) errorMsg.style.display = 'none';
+            };
+
+            // 管理员登录验证 (卡密验证)
+            window.loginWithCard = function() {
+                const enteredCard = cardInput ? cardInput.value.trim() : '';
+
+                if (enteredCard === VALID_CARD) {
+                    // 卡密正确，跳转主页并显示添加按钮
+                    choicePage.style.display = 'none';
+                    loginPage.style.display = 'none';
+                    homePage.style.display = 'block';
+                    if (addWebBtn) addWebBtn.style.display = 'inline-flex'; // 管理员专属显示
+                    if (errorMsg) errorMsg.style.display = 'none';
+                } else {
+                    // 卡密错误
+                    if (errorMsg) errorMsg.style.display = 'block';
+                }
+            };
+
+            // 退出（回到选择页）
+            window.logout = function() {
+                choicePage.style.display = 'block';
+                loginPage.style.display = 'none';
+                homePage.style.display = 'none';
+                if (addWebBtn) addWebBtn.style.display = 'none';
+                if (errorMsg) errorMsg.style.display = 'none';
+                // 可选清空卡密输入
+                if (cardInput) cardInput.value = '';
+            };
+
+            // 管理员添加网页（动态插入新按钮到网格中）
+            window.addWeb = function() {
+                const name = prompt('请输入网页名称：');
+                let url = prompt('请输入网页链接（需包含 http:// 或 https://）：');
+                if (name && url) {
+                    // 简单校验http
+                    if (!url.match(/^https?:\/\//i)) {
+                        alert('链接必须以 http:// 或 https:// 开头，请重新输入');
+                        return;
+                    }
+                    // 获取按钮容器
+                    const container = document.getElementById('btn-grid-container');
+                    const newBtn = document.createElement('a');
+                    newBtn.className = 'btn';
+                    newBtn.style.backgroundColor = getRandomColor();
+                    newBtn.href = url;
+                    newBtn.target = '_blank';
+                    newBtn.textContent = name;
+                    // 插入在添加按钮之前（保证添加按钮始终在最后）
+                    container.insertBefore(newBtn, document.getElementById('add-web-btn'));
+                } else {
+                    alert('名称和链接不能为空哦~');
+                }
+            };
+
+            // 随机颜色生成
+            window.getRandomColor = function() {
+                const colors = ['#e67e22', '#9b59b6', '#3498db', '#1abc9c', '#e74c3c', '#f1c40f', '#2c3e50'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            };
+
+            // 兼容旧的login函数 (如果被意外调用，转到卡密逻辑)
+            window.login = function() {
+                // 旧版账号密码函数不再使用，但为了防止点击错误按钮，可重定向或提示。
+                alert('请使用卡密输入框进行管理员验证');
+            };
+
+        })();
+    </script>
+
+    <!-- 由于原代码还有username/password元素，但已经移除干净，避免残留干扰。
+         但为了防止引用错误，完全去除旧元素。现在页面只有卡密输入框，干净适配。 
+         但是样式里保留了 .input-group 等，正常使用。 -->
 </body>
 </html>
